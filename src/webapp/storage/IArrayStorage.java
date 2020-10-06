@@ -2,8 +2,6 @@ package webapp.storage;
 
 import webapp.model.Resume;
 
-import java.util.Arrays;
-
 public interface IArrayStorage {
 
     void clear();

@@ -1,5 +1,7 @@
 package webapp.model;
 
+import java.util.UUID;
+
 // имплементируем интерфейс Comparable так как необходимо чтобы объекты сравнивались для сортированного массива
 // Compare возвращает число -1 если меньше, 0 равно, +1 если больше
 // после алгоритм двоичного поиска будет работать
@@ -7,14 +9,19 @@ package webapp.model;
 public class Resume implements Comparable<Resume> {
 
     // Unique identifier
-    private String uuid;
+    private final String uuid;
+
+    // вызываем конструктор с большим количеством параметров и делегируем ему метод заполнения конструктора
+    public Resume() {
+        this(UUID.randomUUID().toString());
+    }
+
+    public Resume(String uuid) {
+        this.uuid = uuid;
+    }
 
     public String getUuid() {
         return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     // переопределяем сравнение обьектов для сравнения по uuid

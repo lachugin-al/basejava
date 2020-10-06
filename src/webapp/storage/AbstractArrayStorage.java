@@ -1,5 +1,8 @@
 package webapp.storage;
 
+import webapp.exception.ExistStorageException;
+import webapp.exception.NotExistStorageException;
+import webapp.exception.StorageException;
 import webapp.model.Resume;
 
 import java.util.Arrays;
@@ -12,6 +15,10 @@ public abstract class AbstractArrayStorage implements IArrayStorage {
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int size = 0;
 
+    public int size() {
+        return size;
+    }
+
     public void clear() {
         Arrays.fill(storage, 0, size, null);
         size = 0;
@@ -21,7 +28,7 @@ public abstract class AbstractArrayStorage implements IArrayStorage {
         int index = getIndex(r.getUuid());
         // если index < 0 то резюме нет
         if (index < 0) {
-            System.out.println("Resume " + r.getUuid() + " not exist");
+            throw new NotExistStorageException(r.getUuid());
         } else {
             storage[index] = r;
         }
@@ -31,11 +38,11 @@ public abstract class AbstractArrayStorage implements IArrayStorage {
     public void save(Resume r) {
         int index = getIndex(r.getUuid());
         // если index > 0 то резюме найдено
-        if (index > 0) {
-            System.out.println("Resume " + r.getUuid() + " already exist");
+        if (index >= 0) {
+            throw new ExistStorageException(r.getUuid());
         } else if (size >= storage.length) {
-            System.out.println("Storage overflow");
-            // индивидуальная часть алгоритма для ArrayStorage и SortedArrayStorage
+            throw new StorageException("Storage overflow", r.getUuid());
+        // индивидуальная часть алгоритма для ArrayStorage и SortedArrayStorage
         } else {
             insertElement(r, index);
             size++;
@@ -46,8 +53,8 @@ public abstract class AbstractArrayStorage implements IArrayStorage {
     public void delete(String uuid) {
         int index = getIndex(uuid);
         if (index < 0) {
-            System.out.println("Resume " + uuid + "not exist");
-            // индивидуальная часть алгоритма для ArrayStorage и SortedArrayStorage
+            throw new NotExistStorageException(uuid);
+        // индивидуальная часть алгоритма для ArrayStorage и SortedArrayStorage
         } else {
             fillDeletedElement(index);
             storage[size - 1] = null;
@@ -58,8 +65,7 @@ public abstract class AbstractArrayStorage implements IArrayStorage {
     public Resume get(String uuid) {
         int index = getIndex(uuid);
         if (index < 0) {
-            System.out.println("Resume " + uuid + " not exist");
-            return null;
+            throw new NotExistStorageException(uuid);
         }
         return storage[index];
     }
@@ -75,8 +81,4 @@ public abstract class AbstractArrayStorage implements IArrayStorage {
     protected abstract void fillDeletedElement(int index);
 
     protected abstract int getIndex(String uuid);
-
-    public int size() {
-        return size;
-    }
 }
